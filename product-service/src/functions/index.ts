@@ -1,2 +1,2 @@
-export { getProductsList } from '@functions/getProducts';
+export { getProductsList } from '@functions/getProductsList';
 export { getProductById } from '@functions/getProductById';

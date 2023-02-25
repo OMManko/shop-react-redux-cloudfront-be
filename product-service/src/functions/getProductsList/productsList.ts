@@ -33,6 +33,6 @@ export const productsList = [
 		description: "Build a flying sleigh with Aira Windwhistler, the Wind Elf!",
 		id: "7567ec4b-b10c-45c5-9345-fc73c48a80a1",
 		price: 15,
-		title: "Santa's Sleigh",
-	},
+		title: "Santa's Sleigh"
+	}
 ];
