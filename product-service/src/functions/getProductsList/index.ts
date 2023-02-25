@@ -7,7 +7,15 @@ export const getProductsList = {
       http: {
         method: 'get',
         path: 'products',
-        cors: true
+        cors: true,
+        responses: {
+          200: {
+            description: 'Successfull API Response'
+          },
+          500: {
+            description: 'Error while fetching product list'
+          }
+        }
       },
     },
   ],

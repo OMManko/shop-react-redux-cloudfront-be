@@ -7,7 +7,18 @@ export const getProductById = {
       http: {
         method: 'get',
         path: 'product/{productId}',
-        cors: true
+        cors: true,
+        responses: {
+          200: {
+            description: 'Successfull API Response',
+          },
+          404: {
+            description: 'Product not found'
+          },
+          500: {
+            description: 'Error while fetching product'
+          }
+        }
       },
     },
   ],
