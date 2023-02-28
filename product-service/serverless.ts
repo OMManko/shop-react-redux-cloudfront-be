@@ -34,7 +34,8 @@ const serverlessConfiguration: AWS = {
       concurrency: 10,
     },
     autoswagger: {
-      apiType: 'http'
+      apiType: 'http',
+      basePath: '/${sls:stage}'
     }
   },
 };
