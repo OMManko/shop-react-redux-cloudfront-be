@@ -19,9 +19,7 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-      PRODUCTS_LIST_TABLE: {
-        ref: '${sls:custom.tableName}'
-      }
+      PRODUCTS_LIST_TABLE: '${self:custom.productsListTable}',
     },
     iam: {
       role: {
@@ -36,7 +34,7 @@ const serverlessConfiguration: AWS = {
             'dynamodb:UpdateItem',
             'dynamodb:DeleteItem',
           ],
-          Resource: { 'Fn::GetAtt': ['ProductsListTable', 'Arn'] },
+          Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_LIST_TABLE}'
         }],
       },
     },
@@ -44,7 +42,7 @@ const serverlessConfiguration: AWS = {
   functions: { getProductsList, getProductById, createProduct },
   package: { individually: true },
   custom: {
-    tableName: 'products-list-table-dev',
+    productsListTable: '${self:service}-products-list-table-${opt:stage, self:provider.stage}',
     esbuild: {
       bundle: true,
       minify: false,
@@ -61,38 +59,33 @@ const serverlessConfiguration: AWS = {
     },
     dynamodb:{
       start:{
-        port: 5000,
         inMemory: true,
         migrate: true,
       },
-      stages: "dev"
+      stages: 'dev'
     }
   },
   resources: {
     Resources: {
       ProductsListTable: {
-        Type: "AWS::DynamoDB::Table",
+        Type: 'AWS::DynamoDB::Table',
         Properties: {
-          TableName: '${sls:custom.tableName}',
+          TableName: '${self:provider.environment.PRODUCTS_LIST_TABLE}',
           AttributeDefinitions: [
             {
-              AttributeName: "id",
-              AttributeType: "S",
-            },
-            {
-              AttributeName: "count",
-              AttributeType: "N",
+              AttributeName: 'id',
+              AttributeType: 'S',
             }
           ],
           KeySchema: [{
-            AttributeName: "id",
-            KeyType: "HASH"
+            AttributeName: 'id',
+            KeyType: 'HASH'
           }],
           ProvisionedThroughput: {
             ReadCapacityUnits: 1,
             WriteCapacityUnits: 1
           },
-        }
+        },
       }
     }
   }
