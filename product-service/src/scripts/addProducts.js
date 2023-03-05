@@ -5,6 +5,8 @@ AWS.config.update({ region: REGION });
 
 const ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 const products = fs.readFileSync(require.resolve("./productsList.json"));
+const stocks = fs.readFileSync(require.resolve("./stockList.json"));
+
 const productsRequests = JSON.parse(products.toString()).map((product) => ({
     PutRequest: {
         Item: {
@@ -13,9 +15,18 @@ const productsRequests = JSON.parse(products.toString()).map((product) => ({
     },
 }));
 
+const stocksRequests = JSON.parse(stocks.toString()).map((stock) => ({
+    PutRequest: {
+        Item: {
+            ...stock,
+        },
+    },
+}));
+
 const params = {
     RequestItems: {
-        "product-service-products-list-table-dev": productsRequests
+        "product-service-products-list-table-dev": productsRequests,
+        "product-service-stock-table-dev": stocksRequests
     }
 };
 

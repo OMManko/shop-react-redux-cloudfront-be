@@ -2,7 +2,6 @@ import Ajv from 'ajv';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
-import * as uuid from 'uuid';
 import { StatusCodes } from '../../constants/statusCodes';
 import productService from '../../services';
 import { CreateProduct } from '../../types/api-types';
@@ -32,7 +31,6 @@ const createProduct = async (event: APIGatewayEvent & CreateProduct): Promise<AP
     try {
       const product = await productService.createProduct(
           {
-              id: uuid.v4(),
               title,
               description,
               price,

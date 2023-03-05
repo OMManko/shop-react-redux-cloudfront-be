@@ -20,6 +20,7 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       PRODUCTS_LIST_TABLE: '${self:custom.productsListTable}',
+      STOCK_TABLE: '${self:custom.stockTable}',
     },
     iam: {
       role: {
@@ -34,7 +35,7 @@ const serverlessConfiguration: AWS = {
             'dynamodb:UpdateItem',
             'dynamodb:DeleteItem',
           ],
-          Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_LIST_TABLE}'
+          Resource: ['arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_LIST_TABLE}', 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.STOCK_TABLE}']
         }],
       },
     },
@@ -43,6 +44,7 @@ const serverlessConfiguration: AWS = {
   package: { individually: true },
   custom: {
     productsListTable: '${self:service}-products-list-table-${opt:stage, self:provider.stage}',
+    stockTable: '${self:service}-stock-table-${opt:stage, self:provider.stage}',
     esbuild: {
       bundle: true,
       minify: false,
@@ -86,6 +88,26 @@ const serverlessConfiguration: AWS = {
             WriteCapacityUnits: 1
           },
         },
+      },
+      StockTable: {
+        Type: 'AWS::DynamoDB::Table',
+        Properties: {
+          TableName: '${self:provider.environment.STOCK_TABLE}',
+          AttributeDefinitions: [
+            {
+              AttributeName: 'product_id',
+              AttributeType: 'S',
+            }
+          ],
+          KeySchema: [{
+            AttributeName: 'product_id',
+            KeyType: 'HASH'
+          }],
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1
+          },
+        }
       }
     }
   }
