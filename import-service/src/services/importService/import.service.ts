@@ -9,6 +9,8 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Readable } from 'stream';
 import { Product } from '../../types/api-types';
 
+const { UPLOAD_FOLDER, PARSED_FOLDER } = process.env;
+
 export default class ImportService {
 	constructor(
 		private readonly bucket: string,
@@ -19,7 +21,7 @@ export default class ImportService {
 	async createSignedUrl(file: string): Promise<string> {
 		const params = {
 			Bucket: this.bucket,
-			Key: `uploaded/${file}`,
+			Key: `${UPLOAD_FOLDER}/${file}`,
 		};
 		const command = new PutObjectCommand(params);
 		
@@ -70,7 +72,7 @@ export default class ImportService {
 		const parsedFile = await this.fileParser.parseFileStream(fileStream);
 		
 		try {
-			const targetFileName = file.replace('uploaded', 'parsed');
+			const targetFileName = file.replace(UPLOAD_FOLDER, PARSED_FOLDER);
 			
 			await this.copyFile(file, targetFileName);
 			await this.deleteFile(file);

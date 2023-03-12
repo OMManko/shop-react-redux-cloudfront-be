@@ -19,7 +19,9 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       BUCKET_NAME: '${self:custom.bucketName}',
-      BUCKET_REGION: '${self:provider.region}'
+      BUCKET_REGION: '${self:provider.region}',
+      UPLOAD_FOLDER: 'uploaded',
+      PARSED_FOLDER: 'parsed'
     },
     iam: {
       role: {
@@ -41,7 +43,7 @@ const serverlessConfiguration: AWS = {
   functions: { importProductsFile, importFileParser },
   package: { individually: true },
   custom: {
-    bucketName: 'import-service-dev',
+    bucketName: '${self:service}-upload-${opt:stage, self:provider.stage}',
     esbuild: {
       bundle: true,
       minify: false,
@@ -52,7 +54,7 @@ const serverlessConfiguration: AWS = {
       platform: 'node',
       concurrency: 10,
     },
-  },
+  }
 };
 
 module.exports = serverlessConfiguration;

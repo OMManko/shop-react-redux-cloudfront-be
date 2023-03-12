@@ -7,18 +7,7 @@ export const importProductsFile = {
       http: {
         method: 'get',
         path: '/import',
-        cors: true,
-        requests: {
-          queryParam: true
-        },
-        responses: {
-          200: {
-            description: 'Successfull API Response'
-          },
-          500: {
-            description: 'Error while creating signed URL'
-          }
-        }
+        cors: true
       },
     },
   ],
