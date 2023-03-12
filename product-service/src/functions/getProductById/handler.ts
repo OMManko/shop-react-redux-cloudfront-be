@@ -1,29 +1,30 @@
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { getProductsListMock } from '@functions/getProductsList/getProductsListMock';
-import schema from './schema';
+import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { StatusCodes } from '../../constants/statusCodes';
+import productService from '../../services';
 
-const getProductById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
+const getProductById = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   try {
-    const productsList = await getProductsListMock();
-    const productId = event.pathParameters?.productId;
-    const product = productsList.find((product) => product.id === productId);
+      const productId = event.pathParameters?.productId;
+      const product = await productService.getProductById(productId);
   
     if (product) {
-      return formatJSONResponse(product);
+        console.log('The product was successfully received: ', JSON.stringify(product));
+        return formatJSONResponse(product);
     }
     
+    console.log('The product was not found');
     return formatJSONResponse(
         {
-          message: 'Product not found'
+          message: 'The product was not found'
         },
         StatusCodes.NotFound
     );
     
   } catch (e) {
-    return formatJSONResponse(
+      console.log('Error while fetching product', e);
+      return formatJSONResponse(
         {
           message: 'Error while fetching product'
         },
