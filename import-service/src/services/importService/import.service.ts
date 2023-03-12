@@ -7,7 +7,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Readable } from 'stream';
-import { Product } from '../../types/api-types';
+import fileParserService from '../../services/fileParserService';
 
 const { UPLOAD_FOLDER, PARSED_FOLDER } = process.env;
 
@@ -15,7 +15,6 @@ export default class ImportService {
 	constructor(
 		private readonly bucket: string,
 		private readonly s3Client: S3Client,
-		private readonly fileParser: any
 	) {}
 	
 	async createSignedUrl(file: string): Promise<string> {
@@ -55,7 +54,7 @@ export default class ImportService {
 		console.log(`${file} was successfully deleted`);
 	}
 	
-	async parseFile(file: string): Promise<Product[]> {
+	async parseFile(file: string) {
 		const getObjectParams = {
 			Bucket: this.bucket,
 			Key: file,
@@ -69,7 +68,7 @@ export default class ImportService {
 			return Promise.reject(`${file} was not found`);
 		}
 		
-		const parsedFile = await this.fileParser.parseFileStream(fileStream);
+		const parsedFile = await fileParserService.parseFileStream(fileStream);
 		
 		try {
 			const targetFileName = file.replace(UPLOAD_FOLDER, PARSED_FOLDER);

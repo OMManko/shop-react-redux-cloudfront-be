@@ -7,7 +7,6 @@ export const importFileParser = {
       s3: {
         bucket: 'import-service-upload-dev',
         event: 's3:ObjectCreated:*',
-        existing: true,
         rules: [
           {
             prefix: 'uploaded/'
@@ -15,7 +14,8 @@ export const importFileParser = {
           {
             suffix: '.csv'
           }
-        ]
+        ],
+        existing: true
       },
     },
   ],

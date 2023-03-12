@@ -1,29 +1,21 @@
-import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { S3Event, APIGatewayProxyResult } from 'aws-lambda';
-import { StatusCodes } from '../../constants/statusCodes';
-import { Product } from '../../types/api-types';
+import { S3Event } from 'aws-lambda';
 import importService from '../../services/importService';
 
-const importFileParser = async (event: S3Event): Promise<APIGatewayProxyResult> => {
+const importFileParser = async (event: S3Event) => {
   try {
       await Promise.all(
           event.Records.map(async (record) => {
               const file = record.s3.object.key;
-              const parsed: Product[] = await importService.parseFile(file);
+              
+              await importService.parseFile(file);
             
-              console.log('File was successfully parsed: ', JSON.stringify(parsed));
+              console.log(`File was successfully parsed: ${file}`);
           })
       );
     
   } catch (e) {
     console.log('Error while parsing the file', e);
-    return formatJSONResponse(
-        {
-          message: 'Error while parsing the file'
-        },
-        StatusCodes.InternalServerError
-    );
   }
 };
 
