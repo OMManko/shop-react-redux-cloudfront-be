@@ -1,5 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
+import { importProductsFile } from '@functions/importProductsFile';
+
 const serverlessConfiguration: AWS = {
   service: 'import-service',
   frameworkVersion: '3',
@@ -15,10 +17,30 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      BUCKET_NAME: '${self:custom.bucketName}',
+      BUCKET_REGION: '${self:provider.region}'
+    },
+    iam: {
+      role: {
+        statements: [
+            {
+              Effect: 'Allow',
+              Action: 's3:ListBucket',
+              Resource: 'arn:aws:s3:::${self:custom.bucketName}'
+            },
+            {
+              Effect: 'Allow',
+              Action: 's3:*',
+              Resource: 'arn:aws:s3:::${self:custom.bucketName}/*'
+            }
+        ],
+      },
     },
   },
+  functions: { importProductsFile },
   package: { individually: true },
   custom: {
+    bucketName: 'import-service-uploaded',
     esbuild: {
       bundle: true,
       minify: false,
