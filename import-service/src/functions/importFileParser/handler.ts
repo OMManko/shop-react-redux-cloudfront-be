@@ -1,8 +1,7 @@
-import { middyfy } from '@libs/lambda';
 import { S3Event } from 'aws-lambda';
 import importService from '../../services/importService';
 
-const importFileParser = async (event: S3Event) => {
+export const importFileParser = async (event: S3Event) => {
   try {
       await Promise.all(
           event.Records.map(async (record) => {
@@ -18,7 +17,5 @@ const importFileParser = async (event: S3Event) => {
     console.log('Error while parsing the file', e);
   }
 };
-
-export const main = middyfy(importFileParser);
 
 
