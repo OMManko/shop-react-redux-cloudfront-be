@@ -1,10 +1,9 @@
 import { formatJSONResponse } from '@libs/api-gateway';
-import { middyfy } from '@libs/lambda';
 import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { StatusCodes } from '../../constants/statusCodes';
 import importService from '../../services/importService';
 
-const importProductsFile = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+export const importProductsFile = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
   try {
     const { name: fileName } = event.queryStringParameters || {};
     
@@ -32,7 +31,5 @@ const importProductsFile = async (event: APIGatewayEvent): Promise<APIGatewayPro
     );
   }
 };
-
-export const main = middyfy(importProductsFile);
 
 

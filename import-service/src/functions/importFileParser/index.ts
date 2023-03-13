@@ -5,11 +5,11 @@ export const importFileParser = {
   events: [
     {
       s3: {
-        bucket: 'import-service-upload-dev',
+        bucket: "${self:custom.bucketName}",
         event: 's3:ObjectCreated:*',
         rules: [
           {
-            prefix: 'uploaded/'
+            prefix: "${self:provider.environment.UPLOAD_FOLDER}/",
           },
           {
             suffix: '.csv'

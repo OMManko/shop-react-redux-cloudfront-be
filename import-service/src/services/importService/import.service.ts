@@ -8,6 +8,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Readable } from 'stream';
 import fileParserService from '../../services/fileParserService';
+import { Product } from '../../types/api-types';
 
 const { UPLOAD_FOLDER, PARSED_FOLDER } = process.env;
 
@@ -54,7 +55,7 @@ export default class ImportService {
 		console.log(`${file} was successfully deleted`);
 	}
 	
-	async parseFile(file: string) {
+	async parseFile(file: string): Promise<Product[]> {
 		const getObjectParams = {
 			Bucket: this.bucket,
 			Key: file,
