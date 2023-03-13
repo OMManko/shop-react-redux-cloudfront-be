@@ -6,10 +6,12 @@ export const importFileParser = async (event: S3Event) => {
       await Promise.all(
           event.Records.map(async (record) => {
               const file = record.s3.object.key;
+    
+              console.log(`${file}:  start parsing`);
               
               await importService.parseFile(file);
-            
-              console.log(`File was successfully parsed: ${file}`);
+    
+              console.log(`${file} was successfully parsed`);
           })
       );
     
