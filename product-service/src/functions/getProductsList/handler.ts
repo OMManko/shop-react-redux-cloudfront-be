@@ -1,17 +1,18 @@
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { getProductsListMock } from '@functions/getProductsList/getProductsListMock';
-import schema from './schema';
+import { APIGatewayProxyResult } from 'aws-lambda';
 import { StatusCodes } from '../../constants/statusCodes';
+import productService from '../../services';
 
-const getProductsList: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async () => {
+const getProductsList = async (): Promise<APIGatewayProxyResult> => {
   try {
-    const productsList = await getProductsListMock();
-  
+    const productsList = await productService.getProductsList();
+    
+    console.log('The product list was successfully received: ', JSON.stringify(productsList));
     return formatJSONResponse(productsList);
     
   } catch (e) {
+    console.log('Error while fetching product list', e);
     return formatJSONResponse(
         {
           message: 'Error while fetching product list'
