@@ -38,7 +38,7 @@ const createProduct = async (event: APIGatewayEvent & CreateProduct): Promise<AP
           }
       );
     
-      console.log('The product was successfully created', product);
+      console.log('The product was successfully created: ', JSON.stringify(product));
       
       return formatJSONResponse(product);
   } catch (e) {

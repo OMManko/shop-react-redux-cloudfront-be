@@ -11,7 +11,6 @@ export default class FileParserService {
 				.pipe(csv())
 				.on('error', () => reject('Error while parsing the stream'))
 				.on('data', (item) => {
-					console.log(`Parsed item: ${JSON.stringify(item)}`);
 					parsedData.push(item)
 				})
 				.on('end', () => resolve(parsedData));

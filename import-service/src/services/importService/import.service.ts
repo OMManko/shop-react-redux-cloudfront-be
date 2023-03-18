@@ -5,12 +5,13 @@ import {
 	CopyObjectCommand,
 	DeleteObjectCommand
 } from '@aws-sdk/client-s3';
+import * as AWS from 'aws-sdk';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Readable } from 'stream';
 import fileParserService from '../../services/fileParserService';
 import { Product } from '../../types/api-types';
 
-const { UPLOAD_FOLDER, PARSED_FOLDER } = process.env;
+const { UPLOAD_FOLDER, PARSED_FOLDER, SQS_URL} = process.env;
 
 export default class ImportService {
 	constructor(
@@ -62,6 +63,7 @@ export default class ImportService {
 		};
 		
 		const command = new GetObjectCommand(getObjectParams);
+		const sqs = new AWS.SQS();
 		const response = await this.s3Client.send(command);
 		const fileStream = response.Body as Readable | null;
 		
@@ -69,7 +71,7 @@ export default class ImportService {
 			return Promise.reject(`${file} was not found`);
 		}
 		
-		const parsedFile = await fileParserService.parseFileStream(fileStream);
+		const parsedFileData = await fileParserService.parseFileStream(fileStream);
 		
 		try {
 			const targetFileName = file.replace(UPLOAD_FOLDER, PARSED_FOLDER);
@@ -80,6 +82,31 @@ export default class ImportService {
 			console.log(`${file} was not moved`, e);
 		}
 		
-		return parsedFile;
+		const parsedProducts = parsedFileData.map((product) => (
+			{
+				...product,
+				count: Number(product.count),
+				price: Number(product.price)
+			}
+		));
+		
+		console.log('Start sending imported products to the queue');
+		
+		try {
+			await Promise.all(parsedProducts.map((product) => {
+				sqs.sendMessage(
+					{
+						QueueUrl: SQS_URL,
+						MessageBody: JSON.stringify(product),
+					}, () => {
+						console.log('The product was successfully sent to the queue', JSON.stringify(product));
+					}
+				)
+			}));
+			
+			console.log('Finish sending imported products to the queue');
+		} catch (e) {
+			console.log('Sending products to the queue failed: ', e);
+		}
 	}
 }

@@ -3,6 +3,7 @@ import type { AWS } from '@serverless/typescript';
 import { getProductsList } from '@functions/getProductsList';
 import { getProductById } from '@functions/getProductById';
 import { createProduct } from '@functions/createProduct';
+import { catalogBatchProcess } from '@functions/catalogBatchProcess';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
@@ -21,30 +22,54 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       PRODUCTS_LIST_TABLE: '${self:custom.productsListTable}',
       STOCK_TABLE: '${self:custom.stockTable}',
+      CATALOG_ITEMS_QUEUE: '${self:custom.catalogItemsQueue}',
+      SQS_URL: {
+        Ref: 'CatalogItemsQueue'
+      },
+      SQS_ARN: { 'Fn::GetAtt': ['CatalogItemsQueue', 'Arn'] },
+      SNS_ARN: {
+        Ref: 'CreateProductTopic'
+      }
     },
     iam: {
       role: {
-        statements: [{
-          Effect: 'Allow',
-          Action: [
-            'dynamodb:DescribeTable',
-            'dynamodb:Query',
-            'dynamodb:Scan',
-            'dynamodb:GetItem',
-            'dynamodb:PutItem',
-            'dynamodb:UpdateItem',
-            'dynamodb:DeleteItem',
-          ],
-          Resource: ['arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_LIST_TABLE}', 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.STOCK_TABLE}']
-        }],
+        statements: [
+          {
+            Effect: 'Allow',
+            Action: [
+              'dynamodb:DescribeTable',
+              'dynamodb:Query',
+              'dynamodb:Scan',
+              'dynamodb:GetItem',
+              'dynamodb:PutItem',
+              'dynamodb:UpdateItem',
+              'dynamodb:DeleteItem',
+            ],
+            Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/*'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'sqs:*',
+            Resource: '${self:provider.environment.SQS_ARN}'
+          },
+          {
+            Effect: 'Allow',
+            Action: 'sns:*',
+            Resource: { Ref: 'CreateProductTopic' }
+          }
+        ],
       },
     },
   },
-  functions: { getProductsList, getProductById, createProduct },
+  functions: { getProductsList, getProductById, createProduct, catalogBatchProcess },
   package: { individually: true },
   custom: {
     productsListTable: '${self:service}-products-list-table-${opt:stage, self:provider.stage}',
     stockTable: '${self:service}-stock-table-${opt:stage, self:provider.stage}',
+    catalogItemsQueue: '${self:service}-catalogue-items-queue-${opt:stage, self:provider.stage}',
+    createProductTopic: '${self:service}-create-product-topic-${opt:stage, self:provider.stage}',
+    createProductSubscriptionEmail: 'volha.manko@gmail.com',
+    createFilteredProductSubscriptionEmail: 'pave.manko@gmail.com',
     esbuild: {
       bundle: true,
       minify: false,
@@ -72,7 +97,7 @@ const serverlessConfiguration: AWS = {
       ProductsListTable: {
         Type: 'AWS::DynamoDB::Table',
         Properties: {
-          TableName: '${self:provider.environment.PRODUCTS_LIST_TABLE}',
+          TableName: '${self:custom.productsListTable}',
           AttributeDefinitions: [
             {
               AttributeName: 'id',
@@ -92,7 +117,7 @@ const serverlessConfiguration: AWS = {
       StockTable: {
         Type: 'AWS::DynamoDB::Table',
         Properties: {
-          TableName: '${self:provider.environment.STOCK_TABLE}',
+          TableName: '${self:custom.stockTable}',
           AttributeDefinitions: [
             {
               AttributeName: 'product_id',
@@ -108,6 +133,43 @@ const serverlessConfiguration: AWS = {
             WriteCapacityUnits: 1
           },
         }
+      },
+      CatalogItemsQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: '${self:custom.catalogItemsQueue}',
+        }
+      },
+      CreateProductTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          TopicName: '${self:custom.createProductTopic}',
+        }
+      },
+      CreateProductSubscription: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Protocol: 'email',
+          Endpoint: '${self:custom.createProductSubscriptionEmail}',
+          TopicArn: { Ref: 'CreateProductTopic' }
+        }
+      },
+      CreateFilteredProductSubscription: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Protocol: 'email',
+          Endpoint: '${self:custom.createFilteredProductSubscriptionEmail}',
+          TopicArn: { Ref: 'CreateProductTopic' },
+          FilterPolicy: '{"count":[{"numeric":["<",2]}]}'
+        }
+      }
+    },
+    Outputs: {
+      CatalogItemsQueueUrl: {
+        Value: '${self:provider.environment.SQS_URL}'
+      },
+      CatalogItemsQueueArn: {
+        Value: '${self:provider.environment.SQS_ARN}'
       }
     }
   }

@@ -21,7 +21,8 @@ const serverlessConfiguration: AWS = {
       BUCKET_NAME: '${self:custom.bucketName}',
       BUCKET_REGION: '${self:provider.region}',
       UPLOAD_FOLDER: 'uploaded',
-      PARSED_FOLDER: 'parsed'
+      PARSED_FOLDER: 'parsed',
+      SQS_URL: 'https://sqs.eu-central-1.amazonaws.com/840660993519/product-service-catalogue-items-queue-dev' // TODO
     },
     iam: {
       role: {
@@ -35,6 +36,11 @@ const serverlessConfiguration: AWS = {
               Effect: 'Allow',
               Action: 's3:*',
               Resource: 'arn:aws:s3:::${self:custom.bucketName}/*'
+            },
+            {
+              Effect: 'Allow',
+              Action: 'sqs:*',
+              Resource: 'arn:aws:sqs:eu-central-1:840660993519:product-service-catalogue-items-queue-dev' // TODO
             }
         ],
       },
