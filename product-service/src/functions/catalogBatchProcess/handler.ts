@@ -38,8 +38,6 @@ export const catalogBatchProcess = async (event: SQSEvent) => {
                 console.log('The product was successfully added: ', JSON.stringify(product));
 
                 await notificationService.sendNotification(product);
-
-                return formatJSONResponse(product);
             } catch (e) {
                 console.log('Error while adding a product', e);
 

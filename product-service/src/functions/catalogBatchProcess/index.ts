@@ -6,9 +6,7 @@ export const catalogBatchProcess = {
         {
             sqs: {
                 batchSize: 5,
-                arn: {
-                    'Fn::GetAtt': ['CatalogItemsQueue', 'Arn']
-                }
+                arn: '${self:provider.environment.SQS_ARN}'
             }
         }
     ]

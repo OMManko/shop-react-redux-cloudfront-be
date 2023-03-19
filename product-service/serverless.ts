@@ -47,12 +47,12 @@ const serverlessConfiguration: AWS = {
                     },
                     {
                         Effect: 'Allow',
-                        Action: 'sqs:*',
+                        Action: ["sqs:*"],
                         Resource: { 'Fn::GetAtt': ['CatalogItemsQueue', 'Arn'] }
                     },
                     {
                         Effect: 'Allow',
-                        Action: 'sns:*',
+                        Action: ["sns:*"],
                         Resource: { Ref: 'CreateProductTopic' }
                     }
                 ]
@@ -65,7 +65,7 @@ const serverlessConfiguration: AWS = {
         productsListTable: '${self:service}-products-list-table-${opt:stage, self:provider.stage}',
         stockTable: '${self:service}-stock-table-${opt:stage, self:provider.stage}',
         catalogItemsQueue:
-            '${self:service}-catalogue-items-queue-${opt:stage, self:provider.stage}',
+            '${self:service}-catalogue-items-queue-${opt:stage, self:provider.stage}.fifo',
         createProductTopic:
             '${self:service}-create-product-topic-${opt:stage, self:provider.stage}',
         createProductSubscriptionEmail: 'volha.manko@gmail.com',
@@ -141,7 +141,9 @@ const serverlessConfiguration: AWS = {
             CatalogItemsQueue: {
                 Type: 'AWS::SQS::Queue',
                 Properties: {
-                    QueueName: '${self:custom.catalogItemsQueue}'
+                    QueueName: '${self:custom.catalogItemsQueue}',
+                    FifoQueue: true,
+                    ContentBasedDeduplication: true,
                 }
             },
             CreateProductTopic: {
