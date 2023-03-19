@@ -23,13 +23,11 @@ const serverlessConfiguration: AWS = {
             UPLOAD_FOLDER: 'uploaded',
             PARSED_FOLDER: 'parsed',
             REGION: '${self:provider.region}',
-            SQS_ARN_IMPORT_KEY: '${self:custom.stackName}-CatalogItemsQueueArn',
-            SQS_URL_IMPORT_KEY: '${self:custom.stackName}-CatalogItemsQueueUrl',
             SQS_URL: {
-                'Fn::ImportValue': '${self:provider.environment.SQS_URL_IMPORT_KEY}'
+                'Fn::ImportValue': '${self:custom.stackName}-CatalogItemsQueueUrl'
             },
             SQS_ARN: {
-                'Fn::ImportValue': '${self:provider.environment.SQS_ARN_IMPORT_KEY}'
+                'Fn::ImportValue': '${self:custom.stackName}-CatalogItemsQueueArn'
             }
         },
         iam: {

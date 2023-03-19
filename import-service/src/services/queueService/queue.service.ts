@@ -1,3 +1,4 @@
+import * as uuid from 'uuid';
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { Product } from '../../types/api-types';
 
@@ -7,20 +8,21 @@ export default class QueueService {
     async sendMessage(products: Product[]) {
         const sqsClient = new SQSClient({ region: REGION });
 
-        console.log('Start sending imported products to the queue', JSON.stringify(products));
-
+        console.log('Start sending imported products to the queue: ', JSON.stringify(products));
+        
         try {
             await Promise.all(
                 products.map(product => {
                     const params = {
                         QueueUrl: SQS_URL,
-                        MessageBody: JSON.stringify(product)
+                        MessageBody: JSON.stringify(product),
+                        MessageGroupId: uuid.v4()
                     };
 
                     sqsClient.send(new SendMessageCommand(params));
 
                     console.log(
-                        'The product was successfully sent to the queue',
+                        'The product was successfully sent to the queue: ',
                         JSON.stringify(product)
                     );
                 })

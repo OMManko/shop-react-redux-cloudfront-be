@@ -68,6 +68,14 @@ export default class ImportService {
         }
 
         const parsedFileData = await fileParserService.parseFileStream(fileStream);
+    
+        const parsedProducts = parsedFileData.map(product => ({
+            ...product,
+            count: Number(product.count),
+            price: Number(product.price)
+        }));
+    
+        await queueService.sendMessage(parsedProducts);
 
         try {
             const targetFileName = file.replace(UPLOAD_FOLDER, PARSED_FOLDER);
@@ -77,13 +85,5 @@ export default class ImportService {
         } catch (e) {
             console.log(`${file} was not moved`, e);
         }
-
-        const parsedProducts = parsedFileData.map(product => ({
-            ...product,
-            count: Number(product.count),
-            price: Number(product.price)
-        }));
-
-        await queueService.sendMessage(parsedProducts);
     }
 }
