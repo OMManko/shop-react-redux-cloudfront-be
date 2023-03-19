@@ -12,7 +12,9 @@ export const catalogBatchProcess = async (event: SQSEvent) => {
     const validProducts: ProductInStock[] = [];
     const ajv = new Ajv();
     const validate = ajv.compile(schema);
-
+    
+    console.log('Start validating products');
+    
     try {
         await Promise.all(
             products.map(async (product: ProductInStock) => {
@@ -25,7 +27,11 @@ export const catalogBatchProcess = async (event: SQSEvent) => {
     } catch (e) {
         console.log('Invalid product data', e);
     }
-
+    
+    console.log('Finished validating products: ', validProducts);
+    
+    console.log('Start adding product');
+    
     await Promise.all(
         validProducts.map(async product => {
             try {

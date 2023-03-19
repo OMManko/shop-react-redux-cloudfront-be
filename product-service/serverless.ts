@@ -175,14 +175,14 @@ const serverlessConfiguration: AWS = {
                     Ref: 'CatalogItemsQueue'
                 },
                 Export: {
-                    Name: 'CatalogItemsQueueUrl'
+                    Name: { 'Fn::Sub': '${AWS::StackName}-CatalogItemsQueueUrl' }
                 }
             },
             CatalogItemsQueueArn: {
                 Description: 'CatalogItemsQueue Arn',
                 Value: { 'Fn::GetAtt': ['CatalogItemsQueue', 'Arn'] },
                 Export: {
-                    Name: 'CatalogItemsQueueArn'
+                    Name: { 'Fn::Sub': '${AWS::StackName}-CatalogItemsQueueArn' }
                 }
             }
         }

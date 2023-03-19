@@ -23,8 +23,14 @@ const serverlessConfiguration: AWS = {
             UPLOAD_FOLDER: 'uploaded',
             PARSED_FOLDER: 'parsed',
             REGION: '${self:provider.region}',
-            SQS_URL:
-                'https://sqs.eu-central-1.amazonaws.com/840660993519/product-service-catalogue-items-queue-dev'
+            SQS_ARN_IMPORT_KEY: '${self:custom.stackName}-CatalogItemsQueueArn',
+            SQS_URL_IMPORT_KEY: '${self:custom.stackName}-CatalogItemsQueueUrl',
+            SQS_URL: {
+                'Fn::ImportValue': '${self:provider.environment.SQS_URL_IMPORT_KEY}'
+            },
+            SQS_ARN: {
+                'Fn::ImportValue': '${self:provider.environment.SQS_ARN_IMPORT_KEY}'
+            }
         },
         iam: {
             role: {
@@ -42,8 +48,7 @@ const serverlessConfiguration: AWS = {
                     {
                         Effect: 'Allow',
                         Action: 'sqs:*',
-                        Resource:
-                            'arn:aws:sqs:eu-central-1:840660993519:product-service-catalogue-items-queue-dev'
+                        Resource: '${self:provider.environment.SQS_ARN}'
                     }
                 ]
             }
@@ -53,6 +58,7 @@ const serverlessConfiguration: AWS = {
     package: { individually: true },
     custom: {
         bucketName: '${self:service}-upload-${opt:stage, self:provider.stage}',
+        stackName: 'product-service-dev',
         esbuild: {
             bundle: true,
             minify: false,
