@@ -10,7 +10,13 @@ export default class NotificationService {
         const params = {
             Subject: 'Product addition',
             Message: JSON.stringify(product),
-            TopicArn: SNS_ARN
+            TopicArn: SNS_ARN,
+            MessageAttributes: {
+                count: {
+                    DataType: 'Number',
+                    StringValue: String(product.count),
+                },
+            },
         };
 
         await snsClient.send(new PublishCommand(params));
