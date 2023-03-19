@@ -1,4 +1,4 @@
-import FileParserService from "./fileParser.service";
+import FileParserService from './fileParser.service';
 
 const fileParserService = new FileParserService();
 

@@ -1,5 +1,5 @@
-import * as AWS from "@aws-sdk/client-s3";
-import ImportService from "./import.service";
+import * as AWS from '@aws-sdk/client-s3';
+import ImportService from './import.service';
 
 const { BUCKET_NAME, BUCKET_REGION } = process.env;
 
