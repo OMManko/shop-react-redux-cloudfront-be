@@ -47,12 +47,12 @@ const serverlessConfiguration: AWS = {
                     },
                     {
                         Effect: 'Allow',
-                        Action: ["sqs:*"],
+                        Action: ['sqs:*'],
                         Resource: { 'Fn::GetAtt': ['CatalogItemsQueue', 'Arn'] }
                     },
                     {
                         Effect: 'Allow',
-                        Action: ["sns:*"],
+                        Action: ['sns:*'],
                         Resource: { Ref: 'CreateProductTopic' }
                     }
                 ]
@@ -143,7 +143,7 @@ const serverlessConfiguration: AWS = {
                 Properties: {
                     QueueName: '${self:custom.catalogItemsQueue}',
                     FifoQueue: true,
-                    ContentBasedDeduplication: true,
+                    ContentBasedDeduplication: true
                 }
             },
             CreateProductTopic: {

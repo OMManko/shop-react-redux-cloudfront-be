@@ -37,9 +37,9 @@ const serverlessConfiguration: AWS = {
         Outputs: {
             BasicAuthorizerArn: {
                 Description: 'BasicAuthorizer Arn',
-                Value: { 'Fn::GetAtt': ['BasicAuthorizer', 'Arn'] },
+                Value: { 'Fn::GetAtt': ['BasicAuthorizerLambdaFunction', 'Arn'] },
                 Export: {
-                    Name: { 'Fn::Sub': '${AWS::StackName}-BasicAuthorizerLambdaFunction' }
+                    Name: { 'Fn::Sub': '${AWS::StackName}-BasicAuthorizerArn' }
                 }
             }
         }

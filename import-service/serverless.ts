@@ -31,7 +31,7 @@ const serverlessConfiguration: AWS = {
             },
             BASIC_AUTHORIZER_ARN: {
                 'Fn::ImportValue': '${self:custom.stackName}-BasicAuthorizerArn'
-            },
+            }
         },
         iam: {
             role: {
