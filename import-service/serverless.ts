@@ -24,13 +24,13 @@ const serverlessConfiguration: AWS = {
             PARSED_FOLDER: 'parsed',
             REGION: '${self:provider.region}',
             SQS_URL: {
-                'Fn::ImportValue': '${self:custom.stackName}-CatalogItemsQueueUrl'
+                'Fn::ImportValue': '${self:custom.productServiceStackName}-CatalogItemsQueueUrl'
             },
             SQS_ARN: {
-                'Fn::ImportValue': '${self:custom.stackName}-CatalogItemsQueueArn'
+                'Fn::ImportValue': '${self:custom.productServiceStackName}-CatalogItemsQueueArn'
             },
             BASIC_AUTHORIZER_ARN: {
-                'Fn::ImportValue': '${self:custom.stackName}-BasicAuthorizerArn'
+                'Fn::ImportValue': '${self:custom.authorizationServiceStackName}-BasicAuthorizerArn'
             }
         },
         iam: {
@@ -59,7 +59,8 @@ const serverlessConfiguration: AWS = {
     package: { individually: true },
     custom: {
         bucketName: '${self:service}-upload-${opt:stage, self:provider.stage}',
-        stackName: 'product-service-dev',
+        productServiceStackName: 'product-service-dev',
+        authorizationServiceStackName: 'authorization-service-dev',
         esbuild: {
             bundle: true,
             minify: false,
