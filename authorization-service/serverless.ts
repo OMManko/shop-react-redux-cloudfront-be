@@ -1,6 +1,9 @@
 import type { AWS } from '@serverless/typescript';
 
 import { basicAuthorizer } from '@functions/basicAuthorizer';
+import * as dotenv from 'dotenv';
+
+dotenv.config()
 
 const serverlessConfiguration: AWS = {
     service: 'authorization-service',
@@ -16,7 +19,8 @@ const serverlessConfiguration: AWS = {
         },
         environment: {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-            NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000'
+            NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+            CREDENTIALS: process.env.CREDENTIALS
         }
     },
     functions: { basicAuthorizer },

@@ -7,11 +7,15 @@ export const basicAuthorizer = async (
     event: APIGatewayTokenAuthorizerEvent
 ): Promise<APIGatewayAuthorizerResult> => {
     const { authorizationToken, methodArn } = event;
+    
+    console.log('Start authorization: ', JSON.stringify(event))
 
     if (!authorizationToken) {
         throw new Error('Unauthorized');
     }
-
+    
+    console.log('Authorization token: ', authorizationToken)
+    
     try {
         const isValid = validationService.validateToken(authorizationToken);
 
@@ -24,7 +28,7 @@ export const basicAuthorizer = async (
         console.log(`Authorization response: ${JSON.stringify(response)}`);
 
         return Promise.resolve(response);
-    } catch (e) {
-        throw new Error('Unauthorized', { cause: e });
+    } catch (error) {
+        throw new Error('Unauthorized');
     }
 };
