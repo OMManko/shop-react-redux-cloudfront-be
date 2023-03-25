@@ -1,5 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
+import { basicAuthorizer } from '@functions/basicAuthorizer';
+
 const serverlessConfiguration: AWS = {
     service: 'authorization-service',
     frameworkVersion: '3',
@@ -17,6 +19,7 @@ const serverlessConfiguration: AWS = {
             NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000'
         }
     },
+    functions: { basicAuthorizer },
     package: { individually: true },
     custom: {
         esbuild: {
@@ -28,6 +31,17 @@ const serverlessConfiguration: AWS = {
             define: { 'require.resolve': undefined },
             platform: 'node',
             concurrency: 10
+        }
+    },
+    resources: {
+        Outputs: {
+            BasicAuthorizerArn: {
+                Description: 'BasicAuthorizer Arn',
+                Value: { 'Fn::GetAtt': ['BasicAuthorizer', 'Arn'] },
+                Export: {
+                    Name: { 'Fn::Sub': '${AWS::StackName}-BasicAuthorizerLambdaFunction' }
+                }
+            }
         }
     }
 };

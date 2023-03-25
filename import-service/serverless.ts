@@ -28,7 +28,10 @@ const serverlessConfiguration: AWS = {
             },
             SQS_ARN: {
                 'Fn::ImportValue': '${self:custom.stackName}-CatalogItemsQueueArn'
-            }
+            },
+            BASIC_AUTHORIZER_ARN: {
+                'Fn::ImportValue': '${self:custom.stackName}-BasicAuthorizerArn'
+            },
         },
         iam: {
             role: {
@@ -66,6 +69,39 @@ const serverlessConfiguration: AWS = {
             define: { 'require.resolve': undefined },
             platform: 'node',
             concurrency: 10
+        }
+    },
+    resources: {
+        Resources: {
+            GatewayResponseUnauthorized: {
+                Type: 'AWS::ApiGateway::GatewayResponse',
+                Properties: {
+                    ResponseParameters: {
+                        'gatewayresponse.header.WWW-Authenticate': "'Basic'",
+                        'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+                        'gatewayresponse.header.Access-Control-Allow-Headers': "'*'"
+                    },
+                    RestApiId: {
+                        Ref: 'ApiGatewayRestApi'
+                    },
+                    ResponseType: 'UNAUTHORIZED',
+                    StatusCode: '401'
+                }
+            },
+            GatewayResponseForbidden: {
+                Type: 'AWS::ApiGateway::GatewayResponse',
+                Properties: {
+                    ResponseParameters: {
+                        'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+                        'gatewayresponse.header.Access-Control-Allow-Headers': "'*'"
+                    },
+                    RestApiId: {
+                        Ref: 'ApiGatewayRestApi'
+                    },
+                    ResponseType: 'ACCESS_DENIED',
+                    StatusCode: '403'
+                }
+            }
         }
     }
 };

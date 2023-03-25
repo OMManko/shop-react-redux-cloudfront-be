@@ -15,7 +15,11 @@ export const importFileParser = {
                         suffix: '.csv'
                     }
                 ],
-                existing: true
+                existing: true,
+                authorizer: {
+                    arn: '${self:provider.environment.BASIC_AUTHORIZER_ARN}',
+                    type: 'token'
+                }
             }
         }
     ]
