@@ -29,9 +29,7 @@ const serverlessConfiguration: AWS = {
             SQS_ARN: {
                 'Fn::ImportValue': '${self:custom.productServiceStackName}-CatalogItemsQueueArn'
             },
-            BASIC_AUTHORIZER_ARN: {
-                'Fn::ImportValue': '${self:custom.authorizationServiceStackName}-BasicAuthorizerArn'
-            }
+            BASIC_AUTHORIZER_ARN: 'arn:aws:lambda:eu-central-1:840660993519:function:authorization-service-dev-basicAuthorizer'
         },
         iam: {
             role: {
