@@ -14,6 +14,10 @@ export const importProductsFile = {
                             name: true
                         }
                     }
+                },
+                authorizer: {
+                    arn: '${self:provider.environment.BASIC_AUTHORIZER_ARN}',
+                    type: 'token'
                 }
             }
         }

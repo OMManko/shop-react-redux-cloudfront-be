@@ -24,11 +24,12 @@ const serverlessConfiguration: AWS = {
             PARSED_FOLDER: 'parsed',
             REGION: '${self:provider.region}',
             SQS_URL: {
-                'Fn::ImportValue': '${self:custom.stackName}-CatalogItemsQueueUrl'
+                'Fn::ImportValue': '${self:custom.productServiceStackName}-CatalogItemsQueueUrl'
             },
             SQS_ARN: {
-                'Fn::ImportValue': '${self:custom.stackName}-CatalogItemsQueueArn'
-            }
+                'Fn::ImportValue': '${self:custom.productServiceStackName}-CatalogItemsQueueArn'
+            },
+            BASIC_AUTHORIZER_ARN: 'arn:aws:lambda:eu-central-1:840660993519:function:authorization-service-dev-basicAuthorizer'
         },
         iam: {
             role: {
@@ -56,7 +57,8 @@ const serverlessConfiguration: AWS = {
     package: { individually: true },
     custom: {
         bucketName: '${self:service}-upload-${opt:stage, self:provider.stage}',
-        stackName: 'product-service-dev',
+        productServiceStackName: 'product-service-dev',
+        authorizationServiceStackName: 'authorization-service-dev',
         esbuild: {
             bundle: true,
             minify: false,
@@ -66,6 +68,39 @@ const serverlessConfiguration: AWS = {
             define: { 'require.resolve': undefined },
             platform: 'node',
             concurrency: 10
+        }
+    },
+    resources: {
+        Resources: {
+            GatewayResponseUnauthorized: {
+                Type: 'AWS::ApiGateway::GatewayResponse',
+                Properties: {
+                    ResponseParameters: {
+                        'gatewayresponse.header.WWW-Authenticate': "'Basic'",
+                        'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+                        'gatewayresponse.header.Access-Control-Allow-Headers': "'*'"
+                    },
+                    RestApiId: {
+                        Ref: 'ApiGatewayRestApi'
+                    },
+                    ResponseType: 'UNAUTHORIZED',
+                    StatusCode: '401'
+                }
+            },
+            GatewayResponseForbidden: {
+                Type: 'AWS::ApiGateway::GatewayResponse',
+                Properties: {
+                    ResponseParameters: {
+                        'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+                        'gatewayresponse.header.Access-Control-Allow-Headers': "'*'"
+                    },
+                    RestApiId: {
+                        Ref: 'ApiGatewayRestApi'
+                    },
+                    ResponseType: 'ACCESS_DENIED',
+                    StatusCode: '403'
+                }
+            }
         }
     }
 };

@@ -14,9 +14,9 @@ export default class NotificationService {
             MessageAttributes: {
                 count: {
                     DataType: 'Number',
-                    StringValue: String(product.count),
-                },
-            },
+                    StringValue: String(product.count)
+                }
+            }
         };
 
         await snsClient.send(new PublishCommand(params));
